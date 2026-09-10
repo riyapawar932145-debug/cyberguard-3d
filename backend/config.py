@@ -1,5 +1,6 @@
 """DB connection configuration, driven entirely by environment variables."""
 import os
+from urllib.parse import quote_plus
 
 
 class Config:
@@ -12,9 +13,11 @@ class Config:
     MYSQL_PASSWORD: str = os.environ.get("MYSQL_PASSWORD", "")
     MYSQL_DB: str = os.environ.get("MYSQL_DB", "cyberguard3d")
 
+    # Username/password must be percent-encoded before going into a URL - an unescaped
+    # "@", ":" or "/" in the password would otherwise be misread as part of the URL structure.
     SQLALCHEMY_DATABASE_URI: str = os.environ.get(
         "DATABASE_URL",
-        f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}",
+        f"mysql+pymysql://{quote_plus(MYSQL_USER)}:{quote_plus(MYSQL_PASSWORD)}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}",
     )
 
 

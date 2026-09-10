@@ -28,6 +28,14 @@ func open(title: String, options: Array, on_chosen: Callable) -> void:
 		button_container.add_child(button)
 
 	visible = true
+	_release_mouse()
+
+
+## The mode switch is triggered by the same left-click that's still being processed as the
+## "interact" input event; changing MOUSE_MODE while a mouse button event is mid-flight doesn't
+## reliably show the OS cursor on Windows. Waiting until that event has fully resolved fixes it.
+func _release_mouse() -> void:
+	await get_tree().create_timer(0.1).timeout
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
 

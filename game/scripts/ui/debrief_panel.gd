@@ -52,6 +52,12 @@ func show_debrief(result: Dictionary, on_continue: Callable) -> void:
 		flags_list.add_child(label)
 
 	visible = true
+	_release_mouse()
+
+
+## See ActionPopup._release_mouse() for why this is deferred rather than set immediately.
+func _release_mouse() -> void:
+	await get_tree().create_timer(0.1).timeout
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
 

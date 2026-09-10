@@ -35,8 +35,14 @@ func open(title: String, on_submitted: Callable) -> void:
 	password_edit.text = ""
 	_update_strength("")
 	visible = true
-	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	_release_mouse()
 	password_edit.grab_focus()
+
+
+## See ActionPopup._release_mouse() for why this is deferred rather than set immediately.
+func _release_mouse() -> void:
+	await get_tree().create_timer(0.1).timeout
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
 
 func _on_text_changed(new_text: String) -> void:
