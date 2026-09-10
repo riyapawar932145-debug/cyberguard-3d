@@ -1,0 +1,44 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/website_storefront.gd" id="1"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1"]
+size = Vector3(0.9, 0.68, 0.08)
+
+[sub_resource type="BoxMesh" id="BoxMesh_Card"]
+size = Vector3(0.9, 0.55, 0.05)
+
+[sub_resource type="BoxMesh" id="BoxMesh_Awning"]
+size = Vector3(0.9, 0.12, 0.09)
+
+[node name="WebsiteStorefront" type="StaticBody3D" groups=["interactable"]]
+script = ExtResource("1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_1")
+
+[node name="CardMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.08, 0)
+mesh = SubResource("BoxMesh_Card")
+
+[node name="AwningMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.28, 0.01)
+mesh = SubResource("BoxMesh_Awning")
+
+[node name="TitleLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0.05)
+pixel_size = 0.0025
+billboard = 1
+font_size = 28
+outline_size = 8
+text = "Storefront name"
+width = 260
+
+[node name="StampLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.32, 0.05)
+pixel_size = 0.0025
+billboard = 1
+font_size = 24
+outline_size = 8
+text = "SITE AVOIDED"
+width = 260

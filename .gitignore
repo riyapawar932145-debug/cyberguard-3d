@@ -1,0 +1,19 @@
+# MySQL server install + live data files (not part of the project)
+MySQL/
+
+# Python
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.pytest_cache/
+*.pyc
+
+# Godot
+game/.godot/
+game/.import/
+game/export_presets.cfg
+*.translation
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
