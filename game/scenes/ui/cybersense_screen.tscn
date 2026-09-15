@@ -1,0 +1,103 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/cybersense_screen.gd" id="1"]
+
+[node name="CyberSenseScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.08, 0.09, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="CenterContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(560, 0)
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+text = "CyberSense"
+
+[node name="SubtitleLabel" type="Label" parent="CenterContainer/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3
+modulate = Color(1, 1, 1, 0.6)
+text = "Paste a suspicious message and get an instant risk analysis."
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/Panel/VBox"]
+layout_mode = 2
+
+[node name="InputEdit" type="TextEdit" parent="CenterContainer/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+wrap_mode = 1
+placeholder_text = "Paste an email, message, or call transcript here..."
+
+[node name="ErrorLabel" type="Label" parent="CenterContainer/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+modulate = Color(0.9, 0.32, 0.32, 1)
+text = ""
+
+[node name="AnalyzeButton" type="Button" parent="CenterContainer/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = "Analyze"
+
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/Panel/VBox"]
+layout_mode = 2
+
+[node name="RiskLabel" type="Label" parent="CenterContainer/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+text = ""
+
+[node name="IndicatorsTitleLabel" type="Label" parent="CenterContainer/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+modulate = Color(1, 1, 1, 0.7)
+text = "Indicators Found:"
+
+[node name="IndicatorsList" type="VBoxContainer" parent="CenterContainer/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="BackButton" type="Button" parent="CenterContainer/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+flat = true
+text = "Back"

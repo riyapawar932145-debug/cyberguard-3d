@@ -201,6 +201,18 @@ unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "comma,separated,actions"
 
+[node name="ContentLabel" type="Label" parent="Margin/RootVBox/MainRow/FormPanel/FormVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Content (JSON)"
+
+[node name="ContentEdit" type="TextEdit" parent="Margin/RootVBox/MainRow/FormPanel/FormVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 90)
+wrap_mode = 1
+placeholder_text = "{\"key\": \"value\"}"
+
 [node name="ButtonRow" type="HBoxContainer" parent="Margin/RootVBox/MainRow/FormPanel/FormVBox"]
 layout_mode = 2
 theme_override_constants/separation = 10

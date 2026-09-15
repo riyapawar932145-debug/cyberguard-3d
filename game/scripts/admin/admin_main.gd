@@ -34,6 +34,8 @@ const ROOMS: Array[String] = [
 @onready var red_flags_edit: TextEdit = %RedFlagsEdit
 @onready var correct_actions_label: Label = %CorrectActionsLabel
 @onready var correct_actions_edit: LineEdit = %CorrectActionsEdit
+@onready var content_label: Label = %ContentLabel
+@onready var content_edit: TextEdit = %ContentEdit
 
 @onready var save_button: Button = %SaveButton
 @onready var cancel_button: Button = %CancelButton
@@ -58,6 +60,7 @@ func _ready() -> void:
 	fraud_label.text = Localization.get_string("admin.field.is_fraud")
 	red_flags_label.text = Localization.get_string("admin.field.red_flags")
 	correct_actions_label.text = Localization.get_string("admin.field.correct_actions")
+	content_label.text = Localization.get_string("admin.field.content")
 	save_button.text = Localization.get_string("admin.save")
 	cancel_button.text = Localization.get_string("admin.cancel")
 	delete_button.text = Localization.get_string("admin.delete")
@@ -130,6 +133,7 @@ func _on_item_selected(index: int) -> void:
 	fraud_check.button_pressed = bool(scenario.get("is_fraud", false))
 	red_flags_edit.text = str(scenario.get("red_flags", ""))
 	correct_actions_edit.text = str(scenario.get("correct_actions", ""))
+	content_edit.text = str(scenario.get("content", "") if scenario.get("content") != null else "")
 
 	delete_button.disabled = false
 
@@ -144,6 +148,7 @@ func _reset_form() -> void:
 	fraud_check.button_pressed = false
 	red_flags_edit.text = ""
 	correct_actions_edit.text = ""
+	content_edit.text = ""
 	delete_button.disabled = true
 	scenario_list.deselect_all()
 
@@ -165,6 +170,7 @@ func _on_save_pressed() -> void:
 		"is_fraud": fraud_check.button_pressed,
 		"red_flags": red_flags_edit.text,
 		"correct_actions": correct_actions_edit.text.strip_edges(),
+		"content": content_edit.text.strip_edges(),
 	}
 
 	_show_error("")

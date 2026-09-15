@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://scripts/rooms/phishing_inbox/phishing_inbox.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/objects/email_object.tscn" id="2"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/ui/action_popup.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://scenes/ui/debrief_panel.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/ui/email_reader_popup.tscn" id="7"]
 
 [sub_resource type="Environment" id="Environment_1"]
 background_mode = 1
@@ -131,4 +132,7 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 
 [node name="DebriefPanel" parent="UI" instance=ExtResource("6")]
+unique_name_in_owner = true
+
+[node name="EmailReaderPopup" parent="UI" instance=ExtResource("7")]
 unique_name_in_owner = true

@@ -1,6 +1,22 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/debrief_panel.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="Style_Card"]
+bg_color = Color(0.1, 0.11, 0.14, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.32, 0.35, 0.42, 0.7)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_left = 12
+corner_radius_bottom_right = 12
+content_margin_left = 22
+content_margin_right = 22
+content_margin_top = 20
+content_margin_bottom = 20
 
 [node name="DebriefPanel" type="Control"]
 layout_mode = 3
@@ -19,7 +35,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.55)
+color = Color(0.02, 0.02, 0.03, 0.85)
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -32,6 +48,7 @@ grow_vertical = 2
 [node name="Panel" type="PanelContainer" parent="CenterContainer"]
 layout_mode = 2
 custom_minimum_size = Vector2(420, 0)
+theme_override_styles/panel = SubResource("Style_Card")
 
 [node name="VBox" type="VBoxContainer" parent="CenterContainer/Panel"]
 layout_mode = 2
@@ -49,6 +66,15 @@ unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 1
 text = "Trust Score: +10  (10)"
+
+[node name="BreakdownLabel" type="Label" parent="CenterContainer/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 13
+modulate = Color(1, 1, 1, 0.55)
+text = ""
 
 [node name="HSeparator" type="HSeparator" parent="CenterContainer/Panel/VBox"]
 layout_mode = 2

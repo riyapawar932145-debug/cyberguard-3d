@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/password_input_popup.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/email_reader_popup.gd" id="1"]
 
 [sub_resource type="StyleBoxFlat" id="Style_Card"]
 bg_color = Color(0.1, 0.11, 0.14, 0.98)
@@ -18,7 +18,7 @@ content_margin_right = 22
 content_margin_top = 20
 content_margin_bottom = 20
 
-[node name="PasswordInputPopup" type="Control"]
+[node name="EmailReaderPopup" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -47,77 +47,85 @@ grow_vertical = 2
 
 [node name="Panel" type="PanelContainer" parent="CenterContainer"]
 layout_mode = 2
-custom_minimum_size = Vector2(380, 0)
+custom_minimum_size = Vector2(520, 0)
 theme_override_styles/panel = SubResource("Style_Card")
 
 [node name="VBox" type="VBoxContainer" parent="CenterContainer/Panel"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
 [node name="TitleLabel" type="Label" parent="CenterContainer/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-horizontal_alignment = 1
 autowrap_mode = 3
-text = "Set Your Password"
+text = "Email subject"
 
-[node name="HintLabel" type="Label" parent="CenterContainer/Panel/VBox"]
+[node name="InstructionLabel" type="Label" parent="CenterContainer/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-horizontal_alignment = 1
 autowrap_mode = 3
 modulate = Color(1, 1, 1, 0.6)
-text = ""
+text = "Read the email carefully."
 
 [node name="HSeparator" type="HSeparator" parent="CenterContainer/Panel/VBox"]
 layout_mode = 2
 
-[node name="PasswordEdit" type="LineEdit" parent="CenterContainer/Panel/VBox"]
-unique_name_in_owner = true
+[node name="SenderRow" type="HBoxContainer" parent="CenterContainer/Panel/VBox"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 36)
-placeholder_text = "Type a password..."
 
-[node name="StrengthBar" type="ProgressBar" parent="CenterContainer/Panel/VBox"]
-unique_name_in_owner = true
+[node name="FromLabel" type="Label" parent="CenterContainer/Panel/VBox/SenderRow"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 12)
-show_percentage = false
-value = 0.0
+modulate = Color(1, 1, 1, 0.6)
+text = "From:"
 
-[node name="StrengthLabel" type="Label" parent="CenterContainer/Panel/VBox"]
+[node name="SenderLabel" type="Label" parent="CenterContainer/Panel/VBox/SenderRow"]
 unique_name_in_owner = true
 layout_mode = 2
-horizontal_alignment = 1
-text = "Weak"
+mouse_filter = 0
+text = "Sender Name"
 
-[node name="CrackTimeLabel" type="Label" parent="CenterContainer/Panel/VBox"]
+[node name="BodyLabel" type="RichTextLabel" parent="CenterContainer/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+scroll_active = true
+text = "Email body"
+
+[node name="LinkPreviewLabel" type="Label" parent="CenterContainer/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-horizontal_alignment = 1
+custom_minimum_size = Vector2(0, 20)
 autowrap_mode = 3
+modulate = Color(0.6, 0.8, 1, 1)
 text = ""
 
 [node name="HSeparator2" type="HSeparator" parent="CenterContainer/Panel/VBox"]
 layout_mode = 2
 
-[node name="AttackBar" type="ProgressBar" parent="CenterContainer/Panel/VBox"]
-unique_name_in_owner = true
+[node name="ButtonRow" type="HBoxContainer" parent="CenterContainer/Panel/VBox"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 12)
-show_percentage = false
-value = 0.0
+theme_override_constants/separation = 8
 
-[node name="AttackStatusLabel" type="Label" parent="CenterContainer/Panel/VBox"]
+[node name="ReportButton" type="Button" parent="CenterContainer/Panel/VBox/ButtonRow"]
 unique_name_in_owner = true
 layout_mode = 2
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 16
-text = ""
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 40)
+text = "Report"
 
-[node name="SubmitButton" type="Button" parent="CenterContainer/Panel/VBox"]
+[node name="DeleteButton" type="Button" parent="CenterContainer/Panel/VBox/ButtonRow"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-text = "Submit Password"
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 40)
+text = "Delete"
+
+[node name="IgnoreButton" type="Button" parent="CenterContainer/Panel/VBox/ButtonRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 40)
+text = "Ignore"

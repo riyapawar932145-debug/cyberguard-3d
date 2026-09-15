@@ -5,6 +5,7 @@ extends Control
 
 @onready var verdict_label: Label = %VerdictLabel
 @onready var trust_label: Label = %TrustLabel
+@onready var breakdown_label: Label = %BreakdownLabel
 @onready var flags_title_label: Label = %FlagsTitleLabel
 @onready var flags_list: VBoxContainer = %FlagsList
 @onready var continue_button: Button = %ContinueButton
@@ -33,6 +34,19 @@ func show_debrief(result: Dictionary, on_continue: Callable) -> void:
 		delta,
 		int(result.get("new_trust_score", 0)),
 	]
+
+	var breakdown: Dictionary = result.get("score_breakdown", {})
+	if was_correct and not breakdown.is_empty():
+		var parts: PackedStringArray = []
+		parts.append("%s %+d" % [Localization.get_string("debrief.score_base"), int(breakdown.get("base", 0))])
+		if int(breakdown.get("speed_bonus", 0)) > 0:
+			parts.append("%s %+d" % [Localization.get_string("debrief.score_speed_bonus"), int(breakdown.get("speed_bonus", 0))])
+		if int(breakdown.get("streak_bonus", 0)) > 0:
+			parts.append("%s %+d" % [Localization.get_string("debrief.score_streak_bonus"), int(breakdown.get("streak_bonus", 0))])
+		breakdown_label.text = "  |  ".join(parts)
+		breakdown_label.visible = true
+	else:
+		breakdown_label.visible = false
 
 	var flags_text: String = str(result.get("red_flags", ""))
 	flags_title_label.text = Localization.get_string(

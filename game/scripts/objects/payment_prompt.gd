@@ -1,6 +1,8 @@
 class_name PaymentPrompt
 extends InteractableObject3D
-## A floating UPI/OTP kiosk screen the player can Approve / Decline / Verify First.
+## A floating UPI/OTP kiosk screen. Interaction now happens entirely inside
+## IncomingRequestPopup's live countdown card - this object only renders the in-world
+## consequence once a decision (or a timeout) has been made.
 
 const DEBIT_AMOUNT: String = "Rs 4,999"
 
@@ -22,31 +24,29 @@ func _configure(scenario: Dictionary) -> void:
 	prompt_label.text = str(scenario.get("title", ""))
 
 
+## Intentionally empty: UpiOtpKioskRoom opens IncomingRequestPopup directly instead of the
+## generic ActionPopup - there is no fixed button list, the countdown card handles everything.
 func get_action_options() -> Array:
-	return [
-		{"action": "approve", "label_key": "action.payment.approve"},
-		{"action": "decline", "label_key": "action.payment.decline"},
-		{"action": "verify_first", "label_key": "action.payment.verify_first"},
-	]
+	return []
 
 
 func play_consequence(was_correct: bool, action: String) -> void:
 	stamp_label.visible = true
 
 	match action:
-		"approve":
+		"approved":
 			if was_correct:
 				stamp_label.text = "PAYMENT SENT"
 				_material.albedo_color = Color(0.3, 0.75, 0.4)
 			else:
 				stamp_label.text = "MONEY DEBITED -%s" % DEBIT_AMOUNT
 				_material.albedo_color = Color(0.85, 0.2, 0.2)
-		"decline":
-			stamp_label.text = "PAYMENT BLOCKED"
+		"declined":
+			stamp_label.text = "REQUEST BLOCKED"
 			_material.albedo_color = Color(0.3, 0.75, 0.4) if was_correct else Color(0.55, 0.55, 0.6)
-		"verify_first":
-			stamp_label.text = "VERIFIED SAFE"
-			_material.albedo_color = Color(0.3, 0.75, 0.4) if was_correct else Color(0.55, 0.55, 0.6)
+		"shared_otp":
+			stamp_label.text = "OTP STOLEN"
+			_material.albedo_color = Color(0.85, 0.2, 0.2)
 		_:
 			stamp_label.text = "NO ACTION"
 			_material.albedo_color = Color(0.6, 0.6, 0.65)

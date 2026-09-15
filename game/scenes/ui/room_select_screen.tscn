@@ -79,6 +79,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Leaderboard"
 
+[node name="CyberSenseButton" type="Button" parent="CenterContainer/Panel/VBox/FooterRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "CyberSense"
+
 [node name="LogoutButton" type="Button" parent="CenterContainer/Panel/VBox/FooterRow"]
 unique_name_in_owner = true
 layout_mode = 2

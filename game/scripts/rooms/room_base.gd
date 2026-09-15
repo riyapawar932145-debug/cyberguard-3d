@@ -69,6 +69,34 @@ func _on_scenarios_loaded(room: String, scenarios: Array) -> void:
 		_spawn_next(point)
 
 
+## Protected hook: a read-only copy of the scenarios already fetched for this room, for
+## subclasses (like RapidFireRoom) that manage their own multi-scenario flow instead of the
+## default one-object-per-SpawnPoint spawn cycle.
+func _get_scenario_pool() -> Array:
+	return _all_scenarios.duplicate(true)
+
+
+## Protected hook: HUD streak/level-up/badge toast handling, shared between the normal
+## single-object flow above and subclasses with a custom multi-submission flow (Rapid Fire).
+## Call SessionState.record_result() first - this only reacts to state that's already updated.
+func _handle_progression_toasts(was_correct: bool, old_trust_score: int, new_trust_score: int, badges_awarded: Array) -> void:
+	if not hud:
+		return
+	hud.set_trust_score(SessionState.trust_score)
+
+	if was_correct:
+		var streak: int = SessionState.get_streak(room_name)
+		if streak == 3 or streak == 5 or (streak >= 10 and streak % 5 == 0):
+			hud.show_streak_toast(streak)
+
+	var level_up_title: String = SessionState.check_level_up(old_trust_score, new_trust_score)
+	if level_up_title != "":
+		hud.show_level_up_toast(level_up_title)
+
+	for badge in badges_awarded:
+		hud.show_badge_toast(badge)
+
+
 func _refill_pool() -> void:
 	_pool = _all_scenarios.duplicate(true)
 	_pool.shuffle()
@@ -141,13 +169,10 @@ func _on_result_submitted(result: Dictionary) -> void:
 		return
 
 	var was_correct: bool = result.get("was_correct", false)
-	SessionState.record_result(room_name, was_correct, result.get("new_trust_score", SessionState.trust_score))
-
-	if hud:
-		hud.set_trust_score(SessionState.trust_score)
-		var badge = result.get("badge_awarded")
-		if badge != null:
-			hud.show_badge_toast(badge)
+	var old_trust_score: int = SessionState.trust_score
+	var new_trust_score: int = result.get("new_trust_score", SessionState.trust_score)
+	SessionState.record_result(room_name, was_correct, new_trust_score)
+	_handle_progression_toasts(was_correct, old_trust_score, new_trust_score, result.get("badges_awarded", []))
 
 	var object: Node = _pending_object
 	if object.has_method("play_consequence"):

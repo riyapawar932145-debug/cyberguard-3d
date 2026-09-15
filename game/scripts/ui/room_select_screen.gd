@@ -8,6 +8,8 @@ const ROOMS: Array[String] = [
 	"fake_login_corridor",
 	"password_vault_lab",
 	"safe_browsing_street",
+	"rapid_fire",
+	"vulnerability_hunt",
 ]
 
 const ROOM_SCENES: Dictionary = {
@@ -16,12 +18,15 @@ const ROOM_SCENES: Dictionary = {
 	"fake_login_corridor": "res://scenes/rooms/fake_login_corridor/fake_login_corridor.tscn",
 	"password_vault_lab": "res://scenes/rooms/password_vault_lab/password_vault_lab.tscn",
 	"safe_browsing_street": "res://scenes/rooms/safe_browsing_street/safe_browsing_street.tscn",
+	"rapid_fire": "res://scenes/rooms/rapid_fire/rapid_fire.tscn",
+	"vulnerability_hunt": "res://scenes/rooms/vulnerability_hunt/vulnerability_hunt.tscn",
 }
 
 @onready var username_label: Label = %UsernameLabel
 @onready var trust_label: Label = %TrustLabel
 @onready var room_list: VBoxContainer = %RoomList
 @onready var leaderboard_button: Button = %LeaderboardButton
+@onready var cybersense_button: Button = %CyberSenseButton
 @onready var logout_button: Button = %LogoutButton
 @onready var error_label: Label = %ErrorLabel
 
@@ -37,12 +42,18 @@ func _ready() -> void:
 		return
 
 	username_label.text = SessionState.username
-	trust_label.text = "%s: %d" % [Localization.get_string("hud.trust_score"), SessionState.trust_score]
+	trust_label.text = "%s (%s: %d)" % [
+		SessionState.get_level_title(),
+		Localization.get_string("hud.trust_score"),
+		SessionState.trust_score,
+	]
 
 	_build_room_buttons()
 
 	leaderboard_button.text = Localization.get_string("menu.leaderboard")
 	leaderboard_button.pressed.connect(func() -> void: get_tree().change_scene_to_file("res://scenes/ui/leaderboard_screen.tscn"))
+	cybersense_button.text = Localization.get_string("menu.cybersense")
+	cybersense_button.pressed.connect(func() -> void: get_tree().change_scene_to_file("res://scenes/ui/cybersense_screen.tscn"))
 	logout_button.text = Localization.get_string("menu.logout")
 	logout_button.pressed.connect(_on_logout_pressed)
 

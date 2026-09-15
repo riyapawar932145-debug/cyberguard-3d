@@ -36,6 +36,7 @@ def seeded(app):
                 is_fraud=True,
                 red_flags="wrong domain, urgent tone",
                 correct_actions="reported,deleted",
+                content='{"sender_display": "Bank", "link_url": "http://fake.example"}',
             ),
             Scenario(
                 code="phishing_inbox_02",
@@ -133,6 +134,15 @@ def test_get_scenarios_happy_path(client, seeded):
         assert "red_flags" not in item
         assert "is_fraud" not in item
 
+    fake_kyc = next(i for i in items if i["title"] == "Fake KYC Email")
+    assert fake_kyc["content"] == {"sender_display": "Bank", "link_url": "http://fake.example"}
+
+
+def test_get_scenarios_content_defaults_to_empty_dict_when_unset(client, seeded):
+    resp = client.get("/api/scenarios/upi_otp_kiosk")
+    items = resp.get_json()
+    assert items[0]["content"] == {}
+
 
 def test_get_scenarios_unknown_room_404(client):
     resp = client.get("/api/scenarios/not_a_room")
@@ -159,10 +169,13 @@ def test_submit_result_correct(client, seeded):
     assert resp.status_code == 200
     body = resp.get_json()
     assert body["was_correct"] is True
-    assert body["score_delta"] == 10
-    assert body["new_trust_score"] == 10
+    # base 10 + speed bonus 5 (2500ms is within the fast-response window) + streak bonus 1 (first
+    # correct answer in this room) = 16
+    assert body["score_delta"] == 16
+    assert body["new_trust_score"] == 16
+    assert body["score_breakdown"] == {"base": 10, "speed_bonus": 5, "streak_bonus": 1, "total": 16}
     assert body["red_flags"] == "wrong domain, urgent tone"
-    assert body["badge_awarded"] is None
+    assert body["badges_awarded"] == []
 
 
 def test_submit_result_incorrect(client, seeded):
@@ -179,6 +192,7 @@ def test_submit_result_incorrect(client, seeded):
     assert body["was_correct"] is False
     assert body["score_delta"] == -5
     assert body["new_trust_score"] == 0  # clamped at zero, not negative
+    assert body["score_breakdown"] == {"base": -5, "speed_bonus": 0, "streak_bonus": 0, "total": -5}
 
 
 def test_submit_result_awards_badge_after_five_streak(client, seeded):
@@ -194,7 +208,119 @@ def test_submit_result_awards_badge_after_five_streak(client, seeded):
         )
         last_body = resp.get_json()
 
-    assert last_body["badge_awarded"] == "upi_otp_kiosk_expert"
+    assert "upi_otp_kiosk_expert" in last_body["badges_awarded"]
+
+
+def test_score_breakdown_streak_bonus_grows_and_caps(client, seeded):
+    user_resp = register(client)
+    user_id = user_resp.get_json()["id"]
+    scenario_id = seeded["upi_otp_kiosk_01"]
+
+    streak_bonuses = []
+    for _ in range(7):
+        resp = client.post(
+            "/api/result",
+            json={"user_id": user_id, "scenario_id": scenario_id, "action_taken": "decline"},
+        )
+        streak_bonuses.append(resp.get_json()["score_breakdown"]["streak_bonus"])
+
+    assert streak_bonuses == [1, 2, 3, 4, 5, 5, 5]
+
+
+def test_score_breakdown_incorrect_answer_resets_streak_bonus(client, seeded):
+    user_resp = register(client)
+    user_id = user_resp.get_json()["id"]
+    scenario_id = seeded["upi_otp_kiosk_01"]
+
+    client.post(
+        "/api/result",
+        json={"user_id": user_id, "scenario_id": scenario_id, "action_taken": "decline"},
+    )
+    client.post(
+        "/api/result",
+        json={"user_id": user_id, "scenario_id": scenario_id, "action_taken": "shared_otp"},
+    )
+    resp = client.post(
+        "/api/result",
+        json={"user_id": user_id, "scenario_id": scenario_id, "action_taken": "decline"},
+    )
+    assert resp.get_json()["score_breakdown"]["streak_bonus"] == 1
+
+
+def test_global_achievement_speed_demon(client, seeded):
+    user_resp = register(client)
+    user_id = user_resp.get_json()["id"]
+    scenario_id = seeded["upi_otp_kiosk_01"]
+
+    last_body = None
+    for _ in range(5):
+        resp = client.post(
+            "/api/result",
+            json={
+                "user_id": user_id,
+                "scenario_id": scenario_id,
+                "action_taken": "decline",
+                "response_time_ms": 1500,
+            },
+        )
+        last_body = resp.get_json()
+
+    assert "speed_demon" in last_body["badges_awarded"]
+
+
+def test_global_achievement_perfect_run(client, seeded):
+    user_resp = register(client)
+    user_id = user_resp.get_json()["id"]
+    scenario_id = seeded["upi_otp_kiosk_01"]
+
+    last_body = None
+    for _ in range(10):
+        resp = client.post(
+            "/api/result",
+            json={"user_id": user_id, "scenario_id": scenario_id, "action_taken": "decline"},
+        )
+        last_body = resp.get_json()
+
+    assert "perfect_run" in last_body["badges_awarded"]
+
+
+def test_global_achievement_cyber_sentinel(client, app, seeded):
+    user_resp = register(client)
+    user_id = user_resp.get_json()["id"]
+    scenario_id = seeded["upi_otp_kiosk_01"]
+
+    with app.app_context():
+        user = db.session.get(User, user_id)
+        user.trust_score = 1599
+        db.session.commit()
+
+    resp = client.post(
+        "/api/result",
+        json={"user_id": user_id, "scenario_id": scenario_id, "action_taken": "decline"},
+    )
+    assert "cyber_sentinel" in resp.get_json()["badges_awarded"]
+
+
+def test_global_achievements_only_awarded_once(client, seeded):
+    user_resp = register(client)
+    user_id = user_resp.get_json()["id"]
+    scenario_id = seeded["upi_otp_kiosk_01"]
+
+    all_badges = []
+    for _ in range(10):
+        resp = client.post(
+            "/api/result",
+            json={
+                "user_id": user_id,
+                "scenario_id": scenario_id,
+                "action_taken": "decline",
+                "response_time_ms": 1000,
+            },
+        )
+        all_badges.extend(resp.get_json()["badges_awarded"])
+
+    assert all_badges.count("speed_demon") == 1
+    assert all_badges.count("perfect_run") == 1
 
 
 def test_submit_result_unknown_user_404(client, seeded):
@@ -225,7 +351,7 @@ def test_leaderboard_happy_path(client, seeded):
     assert resp.status_code == 200
     body = resp.get_json()
     assert body[0]["username"] == "alice"
-    assert body[0]["trust_score"] == 10
+    assert body[0]["trust_score"] == 11  # base 10 + streak bonus 1 (first correct answer)
 
 
 def test_leaderboard_empty_ok(client):
@@ -317,6 +443,41 @@ def test_admin_create_scenario_happy_path(client):
     assert body["code"] == "safe_browsing_street_01"
 
 
+def test_admin_create_scenario_accepts_content_as_object(client):
+    resp = client.post(
+        "/api/admin/scenarios",
+        json={
+            "code": "safe_browsing_street_02",
+            "room": "safe_browsing_street",
+            "title": "Amazon",
+            "is_fraud": False,
+            "correct_actions": "enter_site",
+            "content": {"domain": "https://www.amazon.in"},
+        },
+    )
+    assert resp.status_code == 201
+    assert resp.get_json()["content"] == '{"domain": "https://www.amazon.in"}'
+
+    public = client.get("/api/scenarios/safe_browsing_street").get_json()
+    created = next(s for s in public if s["code"] == "safe_browsing_street_02")
+    assert created["content"] == {"domain": "https://www.amazon.in"}
+
+
+def test_admin_create_scenario_rejects_malformed_content_json_400(client):
+    resp = client.post(
+        "/api/admin/scenarios",
+        json={
+            "code": "safe_browsing_street_03",
+            "room": "safe_browsing_street",
+            "title": "Bad Content",
+            "is_fraud": False,
+            "correct_actions": "enter_site",
+            "content": "{not valid json",
+        },
+    )
+    assert resp.status_code == 400
+
+
 def test_admin_create_scenario_duplicate_code_409(client, seeded):
     resp = client.post(
         "/api/admin/scenarios",
@@ -341,6 +502,16 @@ def test_admin_update_scenario_happy_path(client, seeded):
     resp = client.put(f"/api/admin/scenarios/{scenario_id}", json={"title": "Updated Title"})
     assert resp.status_code == 200
     assert resp.get_json()["title"] == "Updated Title"
+
+
+def test_admin_update_scenario_content(client, seeded):
+    scenario_id = seeded["phishing_inbox_01"]
+    resp = client.put(
+        f"/api/admin/scenarios/{scenario_id}",
+        json={"content": {"link_url": "http://updated.example"}},
+    )
+    assert resp.status_code == 200
+    assert resp.get_json()["content"] == '{"link_url": "http://updated.example"}'
 
 
 def test_admin_update_scenario_not_found_404(client):

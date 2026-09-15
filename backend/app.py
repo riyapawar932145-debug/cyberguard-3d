@@ -1,4 +1,5 @@
 ﻿"""CyberGuard 3D Flask API - all route definitions."""
+import json
 import re
 
 from flask import Flask, jsonify, request
@@ -14,17 +15,48 @@ ROOMS = [
     "fake_login_corridor",
     "password_vault_lab",
     "safe_browsing_street",
+    "rapid_fire",
+    "vulnerability_hunt",
 ]
 
 CORRECT_SCORE_DELTA = 10
 INCORRECT_SCORE_DELTA = -5
 STREAK_FOR_BADGE = 5
 
+# Score breakdown tuning: a correct answer earns a base score plus a speed bonus (answering
+# within SPEED_BONUS_FAST_MS earns the full bonus, scaling down to 0 by SPEED_BONUS_SLOW_MS)
+# plus a streak bonus (grows with consecutive correct answers in the same room, capped).
+SPEED_BONUS_MAX = 5
+SPEED_BONUS_FAST_MS = 3000
+SPEED_BONUS_SLOW_MS = 8000
+STREAK_BONUS_CAP = 5
+
+# Cross-room achievement thresholds.
+PERFECT_RUN_STREAK = 10
+SPEED_DEMON_STREAK = 5
+SPEED_DEMON_MAX_MS = 4000
+CYBER_SENTINEL_TRUST_SCORE = 1600
+
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 def error(message: str, status: int):
     return jsonify({"error": message}), status
+
+
+def _normalize_content(value) -> str | None:
+    """Accept content as a JSON object or a JSON-encoded string; store it as a JSON string."""
+    if value is None:
+        return None
+    if isinstance(value, dict):
+        return json.dumps(value)
+    if isinstance(value, str):
+        stripped = value.strip()
+        if not stripped:
+            return None
+        json.loads(stripped)  # raises ValueError if malformed
+        return stripped
+    raise ValueError("content must be a JSON object or a JSON-encoded string")
 
 
 def check_and_award_badge(user: User, room: str):
@@ -50,6 +82,90 @@ def check_and_award_badge(user: User, room: str):
     db.session.add(badge)
     db.session.commit()
     return badge_code
+
+
+def _consecutive_correct_streak(user_id: int, room: str) -> int:
+    """Consecutive correct results for this user in this room, most recent first, BEFORE
+    the result currently being submitted (that one hasn't been inserted yet when this runs)."""
+    recent = (
+        Result.query.join(Scenario, Result.scenario_id == Scenario.id)
+        .filter(Result.user_id == user_id, Scenario.room == room)
+        .order_by(Result.created_at.desc(), Result.id.desc())
+        .limit(STREAK_BONUS_CAP + 1)
+        .all()
+    )
+    streak = 0
+    for r in recent:
+        if not r.was_correct:
+            break
+        streak += 1
+    return streak
+
+
+def _score_breakdown(was_correct: bool, response_time_ms, pre_streak: int) -> dict:
+    base = CORRECT_SCORE_DELTA if was_correct else INCORRECT_SCORE_DELTA
+
+    speed_bonus = 0
+    if was_correct and isinstance(response_time_ms, (int, float)) and response_time_ms >= 0:
+        if response_time_ms <= SPEED_BONUS_FAST_MS:
+            speed_bonus = SPEED_BONUS_MAX
+        elif response_time_ms < SPEED_BONUS_SLOW_MS:
+            fraction = 1 - (response_time_ms - SPEED_BONUS_FAST_MS) / (SPEED_BONUS_SLOW_MS - SPEED_BONUS_FAST_MS)
+            speed_bonus = round(SPEED_BONUS_MAX * fraction)
+
+    streak_bonus = min(pre_streak + 1, STREAK_BONUS_CAP) if was_correct else 0
+
+    return {
+        "base": base,
+        "speed_bonus": speed_bonus,
+        "streak_bonus": streak_bonus,
+        "total": base + speed_bonus + streak_bonus,
+    }
+
+
+def _recent_results(user_id: int, limit: int):
+    return (
+        Result.query.filter_by(user_id=user_id)
+        .order_by(Result.created_at.desc(), Result.id.desc())
+        .limit(limit)
+        .all()
+    )
+
+
+def check_global_achievements(user: User) -> list:
+    """Cross-room achievements, independent of the per-room '<room>_expert' badges."""
+    awarded = []
+    existing = {
+        b.badge_code
+        for b in Badge.query.filter(
+            Badge.user_id == user.id,
+            Badge.badge_code.in_(["perfect_run", "speed_demon", "cyber_sentinel"]),
+        ).all()
+    }
+
+    if "perfect_run" not in existing:
+        recent = _recent_results(user.id, PERFECT_RUN_STREAK)
+        if len(recent) >= PERFECT_RUN_STREAK and all(r.was_correct for r in recent):
+            db.session.add(Badge(user_id=user.id, badge_code="perfect_run"))
+            awarded.append("perfect_run")
+
+    if "speed_demon" not in existing:
+        recent = _recent_results(user.id, SPEED_DEMON_STREAK)
+        if (
+            len(recent) >= SPEED_DEMON_STREAK
+            and all(r.was_correct for r in recent)
+            and all(r.response_time_ms is not None and r.response_time_ms <= SPEED_DEMON_MAX_MS for r in recent)
+        ):
+            db.session.add(Badge(user_id=user.id, badge_code="speed_demon"))
+            awarded.append("speed_demon")
+
+    if "cyber_sentinel" not in existing and user.trust_score >= CYBER_SENTINEL_TRUST_SCORE:
+        db.session.add(Badge(user_id=user.id, badge_code="cyber_sentinel"))
+        awarded.append("cyber_sentinel")
+
+    if awarded:
+        db.session.commit()
+    return awarded
 
 
 def create_app(config_class=Config) -> Flask:
@@ -163,7 +279,10 @@ def register_routes(app: Flask) -> None:
 
         correct_actions = [a.strip() for a in scenario.correct_actions.split(",")]
         was_correct = action_taken in correct_actions
-        score_delta = CORRECT_SCORE_DELTA if was_correct else INCORRECT_SCORE_DELTA
+
+        pre_streak = _consecutive_correct_streak(user.id, scenario.room)
+        breakdown = _score_breakdown(was_correct, response_time_ms, pre_streak)
+        score_delta = breakdown["total"]
         user.trust_score = max(0, user.trust_score + score_delta)
 
         result = Result(
@@ -181,16 +300,21 @@ def register_routes(app: Flask) -> None:
             db.session.rollback()
             return error("could not save result", 400)
 
-        badge_awarded = check_and_award_badge(user, scenario.room)
+        badges_awarded = []
+        room_badge = check_and_award_badge(user, scenario.room)
+        if room_badge:
+            badges_awarded.append(room_badge)
+        badges_awarded.extend(check_global_achievements(user))
 
         return (
             jsonify(
                 {
                     "was_correct": was_correct,
                     "score_delta": score_delta,
+                    "score_breakdown": breakdown,
                     "new_trust_score": user.trust_score,
                     "red_flags": scenario.red_flags,
-                    "badge_awarded": badge_awarded,
+                    "badges_awarded": badges_awarded,
                 }
             ),
             200,
@@ -271,6 +395,11 @@ def register_routes(app: Flask) -> None:
         if not isinstance(is_fraud, bool):
             return error("is_fraud must be a boolean", 400)
 
+        try:
+            content = _normalize_content(body.get("content"))
+        except ValueError as exc:
+            return error(str(exc), 400)
+
         if Scenario.query.filter_by(code=code).first():
             return error("scenario code already exists", 409)
 
@@ -282,6 +411,7 @@ def register_routes(app: Flask) -> None:
             is_fraud=is_fraud,
             red_flags=red_flags,
             correct_actions=correct_actions,
+            content=content,
         )
         db.session.add(scenario)
         try:
@@ -306,8 +436,13 @@ def register_routes(app: Flask) -> None:
             return error(f"unknown room '{body['room']}'", 400)
         if "is_fraud" in body and not isinstance(body["is_fraud"], bool):
             return error("is_fraud must be a boolean", 400)
+        if "content" in body:
+            try:
+                body["content"] = _normalize_content(body["content"])
+            except ValueError as exc:
+                return error(str(exc), 400)
 
-        for field in ("code", "room", "title", "difficulty", "is_fraud", "red_flags", "correct_actions"):
+        for field in ("code", "room", "title", "difficulty", "is_fraud", "red_flags", "correct_actions", "content"):
             if field in body:
                 setattr(scenario, field, body[field])
 

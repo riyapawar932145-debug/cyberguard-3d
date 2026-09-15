@@ -8,6 +8,8 @@ var scenario_id: int = -1
 var scenario_code: String = ""
 var scenario_title: String = ""
 var scenario_difficulty: int = 1
+## Room-specific rich flavor content from the API (email body, caller dialogue, domain, ...).
+var scenario_content: Dictionary = {}
 
 
 func setup(scenario: Dictionary) -> void:
@@ -15,6 +17,7 @@ func setup(scenario: Dictionary) -> void:
 	scenario_code = scenario.get("code", "")
 	scenario_title = scenario.get("title", "")
 	scenario_difficulty = int(scenario.get("difficulty", 1))
+	scenario_content = scenario.get("content", {})
 	_configure(scenario)
 
 

@@ -13,6 +13,7 @@ func on_object_clicked(object: Node) -> void:
 		return
 
 	var click_time_ms: int = Time.get_ticks_msec()
+	var hint: String = str(object.scenario_content.get("hint", ""))
 	password_popup.open(object.scenario_title, func(action: String) -> void:
 		_submit(object, action, Time.get_ticks_msec() - click_time_ms)
-	)
+	, hint)

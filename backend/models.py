@@ -1,4 +1,5 @@
 ﻿"""SQLAlchemy models mirroring schema.sql exactly."""
+import json
 from datetime import datetime, timezone
 
 from flask_sqlalchemy import SQLAlchemy
@@ -44,6 +45,17 @@ class Scenario(db.Model):
     is_fraud = db.Column(db.Boolean, nullable=False)
     red_flags = db.Column(db.Text)
     correct_actions = db.Column(db.String(100), nullable=False)
+    # Room-specific rich flavor content (email body, caller dialogue, domain string, ...) as a
+    # JSON object. Safe to show pre-decision: it never encodes is_fraud or correct_actions.
+    content = db.Column(db.Text)
+
+    def _parsed_content(self) -> dict:
+        if not self.content:
+            return {}
+        try:
+            return json.loads(self.content)
+        except (TypeError, ValueError):
+            return {}
 
     def to_public_dict(self) -> dict:
         """Player-facing view - never leaks the answer key before a result is submitted."""
@@ -53,6 +65,7 @@ class Scenario(db.Model):
             "room": self.room,
             "title": self.title,
             "difficulty": self.difficulty,
+            "content": self._parsed_content(),
         }
 
     def to_admin_dict(self) -> dict:
@@ -65,6 +78,7 @@ class Scenario(db.Model):
             "is_fraud": bool(self.is_fraud),
             "red_flags": self.red_flags,
             "correct_actions": self.correct_actions,
+            "content": self.content,
         }
 
 

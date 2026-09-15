@@ -1,8 +1,9 @@
 class_name WebsiteStorefront
 extends InteractableObject3D
-## A storefront card the player can Enter Site / Check Certificate / Leave on. The AwningMesh
-## strip stands in for the browser's security indicator (padlock/certificate) and tints
-## red/green with the outcome.
+## A storefront card. Interaction now happens entirely inside StorefrontPopup, which always
+## renders the same layout (big central button + small corner controls) regardless of scenario
+## so the UI never hints at whether this one is a trap. The AwningMesh strip stands in for the
+## browser's security indicator (padlock/certificate) and tints red/green with the outcome.
 
 @onready var title_label: Label3D = $TitleLabel
 @onready var card_mesh: MeshInstance3D = $CardMesh
@@ -28,12 +29,10 @@ func _configure(scenario: Dictionary) -> void:
 	title_label.text = str(scenario.get("title", ""))
 
 
+## Intentionally empty: SafeBrowsingStreetRoom opens StorefrontPopup directly instead of the
+## generic ActionPopup.
 func get_action_options() -> Array:
-	return [
-		{"action": "enter_site", "label_key": "action.storefront.enter_site"},
-		{"action": "check_certificate", "label_key": "action.storefront.check_certificate"},
-		{"action": "leave", "label_key": "action.storefront.leave"},
-	]
+	return []
 
 
 func play_consequence(was_correct: bool, action: String) -> void:

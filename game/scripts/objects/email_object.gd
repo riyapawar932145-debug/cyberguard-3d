@@ -20,13 +20,10 @@ func _configure(scenario: Dictionary) -> void:
 	subject_label.text = str(scenario.get("title", ""))
 
 
+## Intentionally empty: PhishingInboxRoom opens EmailReaderPopup directly instead of the
+## generic ActionPopup - "opened" is triggered by clicking the in-body link, not a button.
 func get_action_options() -> Array:
-	return [
-		{"action": "opened", "label_key": "action.email.opened"},
-		{"action": "reported", "label_key": "action.email.reported"},
-		{"action": "deleted", "label_key": "action.email.deleted"},
-		{"action": "ignored", "label_key": "action.email.ignored"},
-	]
+	return []
 
 
 func play_consequence(was_correct: bool, action: String) -> void:
