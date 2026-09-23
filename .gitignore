@@ -5,7 +5,9 @@ MySQL/
 backend/__pycache__/
 backend/**/__pycache__/
 backend/.pytest_cache/
+backend/instance/
 *.pyc
+*.db
 
 # Godot
 game/.godot/
