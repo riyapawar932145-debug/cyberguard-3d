@@ -37,8 +37,8 @@ size = Vector3(0.17, 0.72, 0.17)
 
 [sub_resource type="CapsuleMesh" id="Mesh_Hair"]
 material = SubResource("Mat_Hair")
-radius = 0.2
-height = 0.5
+radius = 0.14
+height = 0.24
 
 [node name="AvatarWoman" type="CharacterBody3D" groups=["player"]]
 script = ExtResource("1")
@@ -58,7 +58,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.58, 0)
 mesh = SubResource("Mesh_Head")
 
 [node name="Hair" type="MeshInstance3D" parent="Model"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.68, -0.05)
 mesh = SubResource("Mesh_Hair")
 
 [node name="ArmLeft" type="MeshInstance3D" parent="Model"]

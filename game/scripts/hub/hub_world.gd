@@ -11,6 +11,8 @@ const AVATAR_SCENES: Dictionary = {
 @onready var spawn_point: Marker3D = $SpawnPoint
 @onready var welcome_label: Label = %WelcomeLabel
 @onready var hint_label: Label = %HintLabel
+@onready var menu_button: Button = %MenuButton
+@onready var menu_hint_label: Label = %MenuHintLabel
 
 
 func _ready() -> void:
@@ -26,6 +28,9 @@ func _ready() -> void:
 
 	welcome_label.text = Localization.get_string("hub.welcome")
 	hint_label.text = Localization.get_string("hub.walk_hint")
+	menu_button.text = Localization.get_string("common.back")
+	menu_button.pressed.connect(_on_menu_pressed)
+	menu_hint_label.text = Localization.get_string("hub.menu_hint")
 
 	var timer: SceneTreeTimer = get_tree().create_timer(4.5)
 	timer.timeout.connect(func() -> void:
@@ -34,3 +39,8 @@ func _ready() -> void:
 		if is_instance_valid(hint_label):
 			hint_label.visible = false
 	)
+
+
+func _on_menu_pressed() -> void:
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	get_tree().change_scene_to_file("res://scenes/ui/room_select_screen.tscn")

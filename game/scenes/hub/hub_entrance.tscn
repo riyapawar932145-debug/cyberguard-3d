@@ -1,22 +1,65 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/hub/hub_entrance.gd" id="1"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_Panel"]
-size = Vector3(2.6, 3.0, 0.3)
+[sub_resource type="BoxMesh" id="BoxMesh_Wall"]
+size = Vector3(1.0, 3.4, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_Wall"]
+size = Vector3(1.0, 3.4, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_Lintel"]
+size = Vector3(3.9, 0.8, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_Lintel"]
+size = Vector3(3.9, 0.8, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="Mat_Interior"]
+albedo_color = Color(0.03, 0.03, 0.05, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_Interior"]
+material = SubResource("Mat_Interior")
+size = Vector3(1.9, 2.7, 0.15)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_Trigger"]
-size = Vector3(3.0, 3.0, 2.5)
+size = Vector3(1.9, 2.7, 2.0)
 
 [node name="HubEntrance" type="Node3D"]
 script = ExtResource("1")
 
-[node name="Panel" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
-mesh = SubResource("BoxMesh_Panel")
+[node name="WallLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 1.7, 0)
+mesh = SubResource("BoxMesh_Wall")
 
-[node name="Label3D" type="Label3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.3, 0)
+[node name="WallLeftBody" type="StaticBody3D" parent="WallLeft"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallLeft/WallLeftBody"]
+shape = SubResource("BoxShape3D_Wall")
+
+[node name="WallRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 1.7, 0)
+mesh = SubResource("BoxMesh_Wall")
+
+[node name="WallRightBody" type="StaticBody3D" parent="WallRight"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallRight/WallRightBody"]
+shape = SubResource("BoxShape3D_Wall")
+
+[node name="Lintel" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, 0)
+mesh = SubResource("BoxMesh_Lintel")
+
+[node name="LintelBody" type="StaticBody3D" parent="Lintel"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Lintel/LintelBody"]
+shape = SubResource("BoxShape3D_Lintel")
+
+[node name="InteriorGlimpse" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, -0.3)
+mesh = SubResource("BoxMesh_Interior")
+
+[node name="SignLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
 pixel_size = 0.006
 billboard = 1
 font_size = 40
@@ -29,5 +72,5 @@ collision_layer = 0
 collision_mask = 1
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Trigger"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0.7)
 shape = SubResource("BoxShape3D_Trigger")
