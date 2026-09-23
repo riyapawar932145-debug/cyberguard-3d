@@ -18,6 +18,9 @@ extends Node3D
 @onready var debrief_panel: Control = %DebriefPanel
 @onready var hud: Control = %HUD
 @onready var instruction_popup: Control = get_node_or_null("%InstructionPopup")
+## The room's Training Officer NPC, if it has one - every room names it "Officer" by
+## convention. The instruction popup anchors its speech bubble above this node.
+@onready var officer_npc: Node3D = get_node_or_null("Officer")
 
 var _spawn_points: Array[Marker3D] = []
 var _all_scenarios: Array = []
@@ -43,7 +46,7 @@ func _ready() -> void:
 		hud.set_trust_score(SessionState.trust_score)
 
 	if instruction_popup and instruction_key != "":
-		instruction_popup.open(instruction_key)
+		instruction_popup.open(instruction_key, officer_npc)
 
 	ApiClient.load_scenarios(room_name)
 

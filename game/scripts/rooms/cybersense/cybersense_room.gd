@@ -6,6 +6,7 @@ extends Node3D
 
 @onready var hud: Control = %HUD
 @onready var instruction_popup: Control = %InstructionPopup
+@onready var officer_npc: Node3D = get_node_or_null("Officer")
 
 
 func _ready() -> void:
@@ -14,7 +15,7 @@ func _ready() -> void:
 		hud.set_room_label("cybersense")
 		hud.set_trust_score(SessionState.trust_score)
 	if instruction_popup:
-		instruction_popup.open("instruction.cybersense")
+		instruction_popup.open("instruction.cybersense", officer_npc)
 
 
 func on_object_clicked(_object: Node) -> void:
