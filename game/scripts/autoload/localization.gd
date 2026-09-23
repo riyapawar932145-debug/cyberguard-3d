@@ -660,5 +660,7 @@ func get_string(key: String) -> String:
 	return _strings["en"].get(key, key)
 
 
+## English only for now - the Hindi/Marathi string tables and translated scenario content stay
+## in place (harmless if unused) but aren't offered as a language choice in the menu.
 func available_languages() -> Array:
-	return _strings.keys()
+	return ["en"]
