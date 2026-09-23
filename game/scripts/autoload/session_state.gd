@@ -11,6 +11,9 @@ var user_id: int = -1
 var username: String = ""
 var trust_score: int = 0
 var preferred_language: String = "en"
+## "man" or "woman" - chosen on the Avatar Selection screen, used by the hub to pick which
+## avatar scene to spawn. Not persisted server-side; re-chosen each time Start is pressed.
+var avatar_gender: String = "man"
 
 ## room_name -> consecutive correct answers in that room.
 var streaks: Dictionary = {}

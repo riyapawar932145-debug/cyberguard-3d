@@ -95,4 +95,4 @@ func _play_next_toast() -> void:
 
 func _on_menu_pressed() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-	get_tree().change_scene_to_file("res://scenes/ui/room_select_screen.tscn")
+	get_tree().change_scene_to_file("res://scenes/hub/hub_world.tscn")

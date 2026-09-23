@@ -43,7 +43,8 @@ func _ready() -> void:
 
 
 func _on_back_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/ui/room_select_screen.tscn")
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	get_tree().change_scene_to_file("res://scenes/rooms/cybersense/cybersense_room.tscn")
 
 
 func _on_analyze_pressed() -> void:

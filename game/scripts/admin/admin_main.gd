@@ -10,6 +10,8 @@ const ROOMS: Array[String] = [
 	"fake_login_corridor",
 	"password_vault_lab",
 	"safe_browsing_street",
+	"rapid_fire",
+	"vulnerability_hunt",
 ]
 
 @onready var no_auth_banner_label: Label = %NoAuthBannerLabel

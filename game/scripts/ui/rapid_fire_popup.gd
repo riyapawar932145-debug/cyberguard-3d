@@ -37,7 +37,7 @@ var _on_complete: Callable = Callable()
 func _ready() -> void:
 	visible = false
 	set_process(false)
-	title_label.text = Localization.get_string("rooms.rapid_fire")
+	title_label.text = Localization.get_string("rapidfire.officer_name")
 	safe_button.text = Localization.get_string("action.rapidfire.safe")
 	unsafe_button.text = Localization.get_string("action.rapidfire.unsafe")
 	done_button.text = Localization.get_string("debrief.continue")
@@ -79,7 +79,7 @@ func _show_current() -> void:
 	var scenario: Dictionary = _queue[_index]
 	var content: Dictionary = scenario.get("content", {})
 	session_progress_label.text = "%d / %d" % [_index + 1, _queue.size()]
-	statement_label.text = str(content.get("statement", scenario.get("title", "")))
+	statement_label.text = "“%s”" % str(content.get("statement", scenario.get("title", "")))
 	feedback_label.text = ""
 	_time_left = COUNTDOWN_SECONDS
 	_awaiting_result = false

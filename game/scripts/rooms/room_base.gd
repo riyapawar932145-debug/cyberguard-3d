@@ -10,10 +10,14 @@ extends Node3D
 
 @export var room_name: String = ""
 @export var object_scene: PackedScene
+## Localization key for the Training Officer's briefing shown every time this room is entered.
+## Leave empty to skip (no room currently does, but the hook stays optional/defensive).
+@export var instruction_key: String = ""
 
 @onready var action_popup: Control = %ActionPopup
 @onready var debrief_panel: Control = %DebriefPanel
 @onready var hud: Control = %HUD
+@onready var instruction_popup: Control = get_node_or_null("%InstructionPopup")
 
 var _spawn_points: Array[Marker3D] = []
 var _all_scenarios: Array = []
@@ -37,6 +41,9 @@ func _ready() -> void:
 	if hud:
 		hud.set_room_label(room_name)
 		hud.set_trust_score(SessionState.trust_score)
+
+	if instruction_popup and instruction_key != "":
+		instruction_popup.open(instruction_key)
 
 	ApiClient.load_scenarios(room_name)
 

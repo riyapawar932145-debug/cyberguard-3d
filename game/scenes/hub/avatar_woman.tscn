@@ -1,0 +1,89 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/hub/avatar_controller.gd" id="1"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
+radius = 0.32
+height = 1.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_Shirt"]
+albedo_color = Color(0.72, 0.22, 0.5, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_Pants"]
+albedo_color = Color(0.18, 0.17, 0.22, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_Skin"]
+albedo_color = Color(0.82, 0.63, 0.5, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_Hair"]
+albedo_color = Color(0.25, 0.16, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_Torso"]
+material = SubResource("Mat_Shirt")
+size = Vector3(0.44, 0.66, 0.28)
+
+[sub_resource type="SphereMesh" id="Mesh_Head"]
+material = SubResource("Mat_Skin")
+radius = 0.18
+height = 0.36
+
+[sub_resource type="BoxMesh" id="Mesh_Arm"]
+material = SubResource("Mat_Shirt")
+size = Vector3(0.13, 0.56, 0.13)
+
+[sub_resource type="BoxMesh" id="Mesh_Leg"]
+material = SubResource("Mat_Pants")
+size = Vector3(0.17, 0.72, 0.17)
+
+[sub_resource type="CapsuleMesh" id="Mesh_Hair"]
+material = SubResource("Mat_Hair")
+radius = 0.2
+height = 0.5
+
+[node name="AvatarWoman" type="CharacterBody3D" groups=["player"]]
+script = ExtResource("1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
+shape = SubResource("CapsuleShape3D_1")
+
+[node name="Model" type="Node3D" parent="."]
+
+[node name="Torso" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.03, 0)
+mesh = SubResource("Mesh_Torso")
+
+[node name="Head" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.58, 0)
+mesh = SubResource("Mesh_Head")
+
+[node name="Hair" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -0.06)
+mesh = SubResource("Mesh_Hair")
+
+[node name="ArmLeft" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 1.04, 0)
+mesh = SubResource("Mesh_Arm")
+
+[node name="ArmRight" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1.04, 0)
+mesh = SubResource("Mesh_Arm")
+
+[node name="LegLeft" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.36, 0)
+mesh = SubResource("Mesh_Leg")
+
+[node name="LegRight" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.36, 0)
+mesh = SubResource("Mesh_Leg")
+
+[node name="CameraPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
+
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraPivot"]
+spring_length = 4.5
+collision_mask = 1
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot/SpringArm3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+fov = 70.0

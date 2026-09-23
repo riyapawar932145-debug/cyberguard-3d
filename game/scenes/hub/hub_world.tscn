@@ -1,0 +1,160 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/hub/hub_world.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/hub/hub_entrance.tscn" id="2"]
+
+[sub_resource type="ProceduralSkyMaterial" id="SkyMat_1"]
+sky_top_color = Color(0.25, 0.45, 0.75, 1)
+sky_horizon_color = Color(0.65, 0.72, 0.8, 1)
+ground_bottom_color = Color(0.15, 0.16, 0.2, 1)
+ground_horizon_color = Color(0.5, 0.5, 0.55, 1)
+
+[sub_resource type="Sky" id="Sky_1"]
+sky_material = SubResource("SkyMat_1")
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 2
+sky = SubResource("Sky_1")
+ambient_light_source = 3
+ambient_light_color = Color(0.7, 0.75, 0.85, 1)
+ambient_light_energy = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Mat_Ground"]
+albedo_color = Color(0.14, 0.16, 0.2, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_Ground"]
+material = SubResource("Mat_Ground")
+size = Vector3(58, 0.4, 58)
+
+[sub_resource type="BoxShape3D" id="Shape_Ground"]
+size = Vector3(58, 0.4, 58)
+
+[sub_resource type="BoxShape3D" id="Shape_Boundary"]
+size = Vector3(60, 6, 1)
+
+[node name="HubWorld" type="Node3D"]
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.75, -0.35, 0.55, 0, 0.85, 0.53, -0.66, -0.4, 0.64, 0, 8, 0)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="Ground" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("Shape_Ground")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("Mesh_Ground")
+
+[node name="BoundaryNorth" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -29)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BoundaryNorth"]
+shape = SubResource("Shape_Boundary")
+
+[node name="BoundarySouth" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 29)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BoundarySouth"]
+shape = SubResource("Shape_Boundary")
+
+[node name="BoundaryEast" type="StaticBody3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 29, 3, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BoundaryEast"]
+shape = SubResource("Shape_Boundary")
+
+[node name="BoundaryWest" type="StaticBody3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -29, 3, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BoundaryWest"]
+shape = SubResource("Shape_Boundary")
+
+[node name="SpawnPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+
+[node name="Entrances" type="Node3D" parent="."]
+
+[node name="PhishingInbox" parent="Entrances" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -18)
+room_label_key = "rooms.phishing_inbox"
+target_scene = "res://scenes/rooms/phishing_inbox/phishing_inbox.tscn"
+panel_color = Color(0.25, 0.4, 0.75, 1)
+
+[node name="UpiOtpKiosk" parent="Entrances" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.7, 0, -12.7)
+room_label_key = "rooms.upi_otp_kiosk"
+target_scene = "res://scenes/rooms/upi_otp_kiosk/upi_otp_kiosk.tscn"
+panel_color = Color(0.85, 0.55, 0.15, 1)
+
+[node name="FakeLoginCorridor" parent="Entrances" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 0)
+room_label_key = "rooms.fake_login_corridor"
+target_scene = "res://scenes/rooms/fake_login_corridor/fake_login_corridor.tscn"
+panel_color = Color(0.75, 0.2, 0.2, 1)
+
+[node name="PasswordVaultLab" parent="Entrances" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.7, 0, 12.7)
+room_label_key = "rooms.password_vault_lab"
+target_scene = "res://scenes/rooms/password_vault_lab/password_vault_lab.tscn"
+panel_color = Color(0.15, 0.55, 0.58, 1)
+
+[node name="SafeBrowsingStreet" parent="Entrances" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 18)
+room_label_key = "rooms.safe_browsing_street"
+target_scene = "res://scenes/rooms/safe_browsing_street/safe_browsing_street.tscn"
+panel_color = Color(0.25, 0.65, 0.45, 1)
+
+[node name="RapidFire" parent="Entrances" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.7, 0, 12.7)
+room_label_key = "rooms.rapid_fire"
+target_scene = "res://scenes/rooms/rapid_fire/rapid_fire.tscn"
+panel_color = Color(0.85, 0.3, 0.15, 1)
+
+[node name="VulnerabilityHunt" parent="Entrances" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0, 0)
+room_label_key = "rooms.vulnerability_hunt"
+target_scene = "res://scenes/rooms/vulnerability_hunt/vulnerability_hunt.tscn"
+panel_color = Color(0.6, 0.5, 0.25, 1)
+
+[node name="CyberSense" parent="Entrances" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.7, 0, -12.7)
+room_label_key = "rooms.cybersense"
+target_scene = "res://scenes/rooms/cybersense/cybersense_room.tscn"
+panel_color = Color(0.4, 0.25, 0.75, 1)
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="WelcomeLabel" type="Label" parent="UI"]
+unique_name_in_owner = true
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -260.0
+offset_top = 24.0
+offset_right = 260.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+text = "Welcome to Cyber City"
+
+[node name="HintLabel" type="Label" parent="UI"]
+unique_name_in_owner = true
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -260.0
+offset_top = 62.0
+offset_right = 260.0
+offset_bottom = 88.0
+grow_horizontal = 2
+horizontal_alignment = 1
+modulate = Color(1, 1, 1, 0.7)
+text = "Walk into a room to begin training."

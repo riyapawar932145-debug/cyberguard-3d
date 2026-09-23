@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://scripts/rooms/rapid_fire/rapid_fire.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/objects/rapid_fire_terminal.tscn" id="2"]
@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/action_popup.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://scenes/ui/debrief_panel.tscn" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/ui/rapid_fire_popup.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/objects/npc_instructor.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/ui/instruction_popup.tscn" id="9"]
 
 [sub_resource type="Environment" id="Environment_1"]
 background_mode = 1
@@ -45,6 +47,7 @@ size = Vector3(0.2, 4, 7)
 [node name="RapidFireRoom" type="Node3D"]
 script = ExtResource("1")
 room_name = "rapid_fire"
+instruction_key = "instruction.rapid_fire"
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_1")
@@ -112,7 +115,10 @@ mesh = SubResource("Mesh_WEWall")
 [node name="SpawnPoints" type="Node3D" parent="."]
 
 [node name="Terminal" parent="." instance=ExtResource("2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.8)
+
+[node name="Officer" parent="." instance=ExtResource("8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.9)
 
 [node name="Player" parent="." instance=ExtResource("3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 2)
@@ -126,6 +132,9 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 
 [node name="DebriefPanel" parent="UI" instance=ExtResource("6")]
+unique_name_in_owner = true
+
+[node name="InstructionPopup" parent="UI" instance=ExtResource("9")]
 unique_name_in_owner = true
 
 [node name="RapidFirePopup" parent="UI" instance=ExtResource("7")]
