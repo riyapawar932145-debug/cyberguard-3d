@@ -9,11 +9,7 @@ extends Control
 
 const SESSION_LENGTH: int = 8
 const COUNTDOWN_SECONDS: float = 6.0
-const BUBBLE_OFFSET_ABOVE: float = 2.2
-const BUBBLE_MARGIN_BELOW: float = 14.0
 
-@onready var bubble: Control = %Bubble
-@onready var tail: Polygon2D = %Tail
 @onready var title_label: Label = %TitleLabel
 @onready var session_progress_label: Label = %SessionProgressLabel
 @onready var countdown_bar: ProgressBar = %CountdownBar
@@ -36,8 +32,6 @@ var _awaiting_result: bool = false
 var _click_time_ms: int = 0
 var _on_result: Callable = Callable()
 var _on_complete: Callable = Callable()
-var _follow_target: Node3D = null
-var _camera: Camera3D = null
 
 
 func _ready() -> void:
@@ -56,13 +50,10 @@ func _ready() -> void:
 
 ## on_result(result: Dictionary) fires after each answered (non-timeout) statement, before the
 ## next one loads - the room uses it to update Trust Score and show progression toasts.
-## on_complete() fires once, after the session summary's Done button is pressed. officer, if
-## given, anchors the speech bubble above that NPC instead of centering it on screen.
-func start_session(pool: Array, on_result: Callable, on_complete: Callable, officer: Node3D = null) -> void:
+## on_complete() fires once, after the session summary's Done button is pressed.
+func start_session(pool: Array, on_result: Callable, on_complete: Callable) -> void:
 	_on_result = on_result
 	_on_complete = on_complete
-	_follow_target = officer
-	_camera = get_viewport().get_camera_3d()
 
 	_queue = pool.duplicate(true)
 	_queue.shuffle()
@@ -98,8 +89,6 @@ func _show_current() -> void:
 
 
 func _process(delta: float) -> void:
-	_update_bubble_position()
-
 	if _awaiting_result:
 		return
 	_time_left -= delta
@@ -107,27 +96,6 @@ func _process(delta: float) -> void:
 	if _time_left <= 0.0:
 		_time_left = 0.0
 		_on_timeout()
-
-
-func _update_bubble_position() -> void:
-	if not _camera or not _follow_target or not is_instance_valid(_follow_target):
-		return
-
-	var head_pos: Vector3 = _follow_target.global_position + Vector3(0, BUBBLE_OFFSET_ABOVE, 0)
-
-	if _camera.is_position_behind(head_pos):
-		bubble.visible = false
-		tail.visible = false
-		return
-
-	bubble.visible = true
-	tail.visible = true
-
-	var screen_pos: Vector2 = _camera.unproject_position(head_pos)
-	var target_x: float = clampf(screen_pos.x - bubble.size.x / 2.0, 12.0, get_viewport_rect().size.x - bubble.size.x - 12.0)
-	var target_y: float = maxf(screen_pos.y - bubble.size.y - BUBBLE_MARGIN_BELOW, 12.0)
-	bubble.position = Vector2(target_x, target_y)
-	tail.position = Vector2(clampf(screen_pos.x, bubble.position.x + 10.0, bubble.position.x + bubble.size.x - 10.0), bubble.position.y + bubble.size.y)
 
 
 func _on_answer_pressed(action: String) -> void:

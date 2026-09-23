@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://scripts/rooms/safe_browsing_street/safe_browsing_street.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/objects/website_storefront.tscn" id="2"]
@@ -7,7 +7,6 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/action_popup.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://scenes/ui/debrief_panel.tscn" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/ui/storefront_popup.tscn" id="7"]
-[ext_resource type="PackedScene" path="res://scenes/objects/npc_instructor.tscn" id="8"]
 [ext_resource type="PackedScene" path="res://scenes/ui/instruction_popup.tscn" id="9"]
 
 [sub_resource type="Environment" id="Environment_1"]
@@ -129,9 +128,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.5, -3.8)
 
 [node name="Spawn5" type="Marker3D" parent="SpawnPoints"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1.5, -3.8)
-
-[node name="Officer" parent="." instance=ExtResource("8")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.3, 0, 3.2)
 
 [node name="Player" parent="." instance=ExtResource("3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 2.5)
