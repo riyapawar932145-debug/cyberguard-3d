@@ -27,13 +27,19 @@ func _unhandled_input(event: InputEvent) -> void:
 		_pitch = clampf(_pitch - event.relative.y * mouse_sensitivity, -1.4, 1.4)
 		head.rotation.x = _pitch
 
-	# No Esc-to-toggle here deliberately: on Web export, browsers refuse to ever re-grant
-	# pointer lock after the user has pressed Esc to release it themselves (a hard anti-abuse
-	# rule, not something the game can work around) - so binding Esc to release capture would
-	# permanently strand the player with no way back in without reloading the page. The mouse
-	# can still end up uncaptured other ways (switching browser tabs and back, clicking outside
-	# the canvas), which don't trigger that restriction - a left-click while free recaptures it,
-	# consumed here rather than also firing an interact raycast so re-focusing never double-fires.
+	# Tab (not Esc!) releases the mouse to reach the HUD's Back button. On Web export, browsers
+	# refuse to ever re-grant pointer lock after the user presses the browser's own Escape
+	# override, permanently stranding the player - but a plain script-driven mode change like
+	# this one (the same mechanism every popup already uses to release/recapture the mouse)
+	# doesn't trigger that restriction, so Tab can safely toggle back and forth.
+	if event is InputEventKey and event.pressed and event.keycode == KEY_TAB:
+		var capture: bool = Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED if capture else Input.MOUSE_MODE_VISIBLE)
+		return
+
+	# The mouse can also end up uncaptured other ways (switching browser tabs and back, clicking
+	# outside the canvas) - a left-click while free recaptures it, consumed here rather than also
+	# firing an interact raycast so re-focusing the game never double-fires an interaction.
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT \
 			and Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)

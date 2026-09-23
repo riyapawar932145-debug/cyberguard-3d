@@ -32,9 +32,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera_pivot.rotation.y = _yaw
 		camera_pivot.rotation.x = _pitch
 
-	# No Esc-to-toggle here deliberately - see Player._unhandled_input() for why: on Web export,
-	# browsers permanently refuse to re-grant pointer lock once the user presses Esc to release
-	# it themselves. A left-click while the mouse is free recaptures it instead.
+	# Tab (not Esc) toggles mouse release - see Player._unhandled_input() for why. A left-click
+	# while the mouse is free also recaptures it (covers losing it other ways, e.g. tabbing away).
+	if event is InputEventKey and event.pressed and event.keycode == KEY_TAB:
+		var capture: bool = Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED if capture else Input.MOUSE_MODE_VISIBLE)
+		return
+
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT \
 			and Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)

@@ -198,7 +198,7 @@ var _strings: Dictionary = {
 
 		"hub.welcome": "Welcome to Cyber City",
 		"hub.walk_hint": "Walk into a room to begin training.",
-		"hub.menu_hint": "Esc to click",
+		"hub.menu_hint": "Tab to click",
 
 		"instruction.title_prefix": "Training Briefing:",
 		"instruction.continue": "Got It",
@@ -410,7 +410,7 @@ var _strings: Dictionary = {
 
 		"hub.welcome": "साइबर सिटी में आपका स्वागत है",
 		"hub.walk_hint": "प्रशिक्षण शुरू करने के लिए किसी कमरे में चलें।",
-		"hub.menu_hint": "क्लिक करने के लिए Esc दबाएं",
+		"hub.menu_hint": "क्लिक करने के लिए Tab दबाएं",
 
 		"instruction.title_prefix": "प्रशिक्षण ब्रीफिंग:",
 		"instruction.continue": "समझ गया",
@@ -622,7 +622,7 @@ var _strings: Dictionary = {
 
 		"hub.welcome": "सायबर सिटीमध्ये आपले स्वागत आहे",
 		"hub.walk_hint": "प्रशिक्षण सुरू करण्यासाठी एखाद्या खोलीत चाला.",
-		"hub.menu_hint": "क्लिक करण्यासाठी Esc दाबा",
+		"hub.menu_hint": "क्लिक करण्यासाठी Tab दाबा",
 
 		"instruction.title_prefix": "प्रशिक्षण माहिती:",
 		"instruction.continue": "समजले",
