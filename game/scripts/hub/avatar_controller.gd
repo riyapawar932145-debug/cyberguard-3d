@@ -32,9 +32,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera_pivot.rotation.y = _yaw
 		camera_pivot.rotation.x = _pitch
 
-	# Tab (not Esc) toggles mouse release - see Player._unhandled_input() for why. A left-click
-	# while the mouse is free also recaptures it (covers losing it other ways, e.g. tabbing away).
-	if event is InputEventKey and event.pressed and event.keycode == KEY_TAB:
+	# M (not Esc or Tab) toggles mouse release - see Player._unhandled_input() for why. A
+	# left-click while the mouse is free also recaptures it (e.g. after tabbing away and back).
+	if event is InputEventKey and event.pressed and event.keycode == KEY_M:
 		var capture: bool = Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED if capture else Input.MOUSE_MODE_VISIBLE)
 		return

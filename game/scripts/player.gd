@@ -27,12 +27,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		_pitch = clampf(_pitch - event.relative.y * mouse_sensitivity, -1.4, 1.4)
 		head.rotation.x = _pitch
 
-	# Tab (not Esc!) releases the mouse to reach the HUD's Back button. On Web export, browsers
-	# refuse to ever re-grant pointer lock after the user presses the browser's own Escape
-	# override, permanently stranding the player - but a plain script-driven mode change like
-	# this one (the same mechanism every popup already uses to release/recapture the mouse)
-	# doesn't trigger that restriction, so Tab can safely toggle back and forth.
-	if event is InputEventKey and event.pressed and event.keycode == KEY_TAB:
+	# M (not Esc or Tab!) releases the mouse to reach the HUD's Back button. Esc is out because
+	# on Web export, browsers refuse to ever re-grant pointer lock after the user presses the
+	# browser's own Escape override, permanently stranding the player. Tab is also out because
+	# browsers intercept it for their own focus-navigation before the game ever sees it. A plain
+	# letter key isn't reserved by anything, and a script-driven mode change like this one (the
+	# same mechanism every popup already uses to release/recapture the mouse) doesn't trigger
+	# the Escape restriction, so M can safely toggle back and forth.
+	if event is InputEventKey and event.pressed and event.keycode == KEY_M:
 		var capture: bool = Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED if capture else Input.MOUSE_MODE_VISIBLE)
 		return
