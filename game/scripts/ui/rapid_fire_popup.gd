@@ -6,10 +6,19 @@ extends Control
 ## every one of many rapid answers would defeat the entire point of "rapid". A session summary
 ## appears at the end instead. Runs its own submit-and-wait cycle directly against ApiClient
 ## rather than RoomBase's one-object flow; see RapidFireRoom for how the two stay decoupled.
+##
+## Renders as a speech bubble anchored above the Officer NPC's head (with a pointer tail) instead
+## of a centered dialog. Position is recomputed once per question - not every frame - after the
+## container has settled into its real size for the new text; see _reposition_bubble().
 
 const SESSION_LENGTH: int = 8
 const COUNTDOWN_SECONDS: float = 6.0
+const HEAD_HEIGHT: float = 1.75
+const TAIL_GAP: float = 16.0
+const SCREEN_MARGIN: float = 16.0
 
+@onready var bubble: PanelContainer = %Bubble
+@onready var tail: Polygon2D = %Tail
 @onready var title_label: Label = %TitleLabel
 @onready var session_progress_label: Label = %SessionProgressLabel
 @onready var countdown_bar: ProgressBar = %CountdownBar
@@ -32,6 +41,8 @@ var _awaiting_result: bool = false
 var _click_time_ms: int = 0
 var _on_result: Callable = Callable()
 var _on_complete: Callable = Callable()
+var _officer: Node3D = null
+var _camera: Camera3D = null
 
 
 func _ready() -> void:
@@ -50,10 +61,13 @@ func _ready() -> void:
 
 ## on_result(result: Dictionary) fires after each answered (non-timeout) statement, before the
 ## next one loads - the room uses it to update Trust Score and show progression toasts.
-## on_complete() fires once, after the session summary's Done button is pressed.
-func start_session(pool: Array, on_result: Callable, on_complete: Callable) -> void:
+## on_complete() fires once, after the session summary's Done button is pressed. officer, if
+## given, anchors the speech bubble above that NPC instead of centering it on screen.
+func start_session(pool: Array, on_result: Callable, on_complete: Callable, officer: Node3D = null) -> void:
 	_on_result = on_result
 	_on_complete = on_complete
+	_officer = officer
+	_camera = get_viewport().get_camera_3d()
 
 	_queue = pool.duplicate(true)
 	_queue.shuffle()
@@ -86,6 +100,7 @@ func _show_current() -> void:
 	_set_buttons_enabled(true)
 	_click_time_ms = Time.get_ticks_msec()
 	set_process(true)
+	_reposition_bubble()
 
 
 func _process(delta: float) -> void:
@@ -96,6 +111,36 @@ func _process(delta: float) -> void:
 	if _time_left <= 0.0:
 		_time_left = 0.0
 		_on_timeout()
+
+
+## Anchors the bubble above the Officer's head with a pointer tail, computed once (not per-frame)
+## after the container has had a chance to settle into its real size for the current text -
+## reading bubble.size before that settle pass is what made an earlier attempt at this balloon to
+## the wrong height and cover the NPC. Falls back to a screen-centered bubble with no tail when
+## there's no officer, no camera, or the officer isn't currently in view.
+func _reposition_bubble() -> void:
+	await get_tree().process_frame
+	bubble.reset_size()
+	var viewport_size: Vector2 = get_viewport_rect().size
+
+	if not _camera or not _officer or not is_instance_valid(_officer):
+		tail.visible = false
+		bubble.position = (viewport_size - bubble.size) / 2.0
+		return
+
+	var head_pos: Vector3 = _officer.global_position + Vector3(0, HEAD_HEIGHT, 0)
+	if _camera.is_position_behind(head_pos):
+		tail.visible = false
+		bubble.position = (viewport_size - bubble.size) / 2.0
+		return
+
+	var screen_pos: Vector2 = _camera.unproject_position(head_pos)
+	var bx: float = clampf(screen_pos.x - bubble.size.x / 2.0, SCREEN_MARGIN, maxf(SCREEN_MARGIN, viewport_size.x - bubble.size.x - SCREEN_MARGIN))
+	var by: float = clampf(screen_pos.y - bubble.size.y - TAIL_GAP, SCREEN_MARGIN, maxf(SCREEN_MARGIN, viewport_size.y - bubble.size.y - SCREEN_MARGIN))
+	bubble.position = Vector2(bx, by)
+
+	tail.visible = true
+	tail.position = Vector2(clampf(screen_pos.x, bubble.position.x + 16.0, bubble.position.x + bubble.size.x - 16.0), bubble.position.y + bubble.size.y)
 
 
 func _on_answer_pressed(action: String) -> void:
@@ -172,6 +217,7 @@ func _show_summary() -> void:
 		_total_score,
 		Localization.get_string("hud.trust_score"),
 	]
+	_reposition_bubble()
 
 
 func _on_done_pressed() -> void:

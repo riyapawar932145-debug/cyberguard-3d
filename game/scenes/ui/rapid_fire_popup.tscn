@@ -2,21 +2,21 @@
 
 [ext_resource type="Script" path="res://scripts/ui/rapid_fire_popup.gd" id="1"]
 
-[sub_resource type="StyleBoxFlat" id="Style_Card"]
-bg_color = Color(0.1, 0.11, 0.14, 0.98)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.32, 0.35, 0.42, 0.7)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_left = 12
-corner_radius_bottom_right = 12
+[sub_resource type="StyleBoxFlat" id="Style_Bubble"]
+bg_color = Color(0.97, 0.96, 0.92, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.42, 0.2, 0.85)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_left = 16
+corner_radius_bottom_right = 16
 content_margin_left = 22
 content_margin_right = 22
-content_margin_top = 20
-content_margin_bottom = 20
+content_margin_top = 18
+content_margin_bottom = 18
 
 [node name="RapidFirePopup" type="Control"]
 layout_mode = 3
@@ -35,76 +35,72 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.02, 0.02, 0.03, 0.85)
+color = Color(0.02, 0.02, 0.03, 0.72)
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Panel" type="PanelContainer" parent="CenterContainer"]
-layout_mode = 2
+[node name="Bubble" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 480.0
 custom_minimum_size = Vector2(480, 0)
-theme_override_styles/panel = SubResource("Style_Card")
+theme_override_styles/panel = SubResource("Style_Bubble")
 
-[node name="VBox" type="VBoxContainer" parent="CenterContainer/Panel"]
+[node name="VBox" type="VBoxContainer" parent="Bubble"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/Panel/VBox"]
+[node name="TitleLabel" type="Label" parent="Bubble/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.35, 0.22, 0.05, 1)
 horizontal_alignment = 1
 text = "Training Officer"
 
-[node name="HSeparator" type="HSeparator" parent="CenterContainer/Panel/VBox"]
+[node name="HSeparator" type="HSeparator" parent="Bubble/VBox"]
 layout_mode = 2
 
-[node name="ErrorLabel" type="Label" parent="CenterContainer/Panel/VBox"]
+[node name="ErrorLabel" type="Label" parent="Bubble/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 3
-modulate = Color(0.9, 0.32, 0.32, 1)
+modulate = Color(0.75, 0.15, 0.15, 1)
 text = ""
 
-[node name="QuestionBox" type="VBoxContainer" parent="CenterContainer/Panel/VBox"]
+[node name="QuestionBox" type="VBoxContainer" parent="Bubble/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="SessionProgressLabel" type="Label" parent="CenterContainer/Panel/VBox/QuestionBox"]
+[node name="SessionProgressLabel" type="Label" parent="Bubble/VBox/QuestionBox"]
 unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 1
-modulate = Color(1, 1, 1, 0.6)
+theme_override_colors/font_color = Color(0.4, 0.36, 0.3, 1)
 text = "1 / 8"
 
-[node name="CountdownBar" type="ProgressBar" parent="CenterContainer/Panel/VBox/QuestionBox"]
+[node name="CountdownBar" type="ProgressBar" parent="Bubble/VBox/QuestionBox"]
 unique_name_in_owner = true
 layout_mode = 2
 custom_minimum_size = Vector2(0, 10)
 show_percentage = false
 value = 100.0
 
-[node name="StatementLabel" type="Label" parent="CenterContainer/Panel/VBox/QuestionBox"]
+[node name="StatementLabel" type="Label" parent="Bubble/VBox/QuestionBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.12, 0.1, 0.08, 1)
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 text = "Statement goes here."
 
-[node name="ButtonRow" type="HBoxContainer" parent="CenterContainer/Panel/VBox/QuestionBox"]
+[node name="ButtonRow" type="HBoxContainer" parent="Bubble/VBox/QuestionBox"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="SafeButton" type="Button" parent="CenterContainer/Panel/VBox/QuestionBox/ButtonRow"]
+[node name="SafeButton" type="Button" parent="Bubble/VBox/QuestionBox/ButtonRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -112,7 +108,7 @@ custom_minimum_size = Vector2(0, 48)
 theme_override_font_sizes/font_size = 18
 text = "Safe"
 
-[node name="UnsafeButton" type="Button" parent="CenterContainer/Panel/VBox/QuestionBox/ButtonRow"]
+[node name="UnsafeButton" type="Button" parent="Bubble/VBox/QuestionBox/ButtonRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -120,28 +116,34 @@ custom_minimum_size = Vector2(0, 48)
 theme_override_font_sizes/font_size = 18
 text = "Unsafe"
 
-[node name="FeedbackLabel" type="Label" parent="CenterContainer/Panel/VBox/QuestionBox"]
+[node name="FeedbackLabel" type="Label" parent="Bubble/VBox/QuestionBox"]
 unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 18
 text = ""
 
-[node name="SummaryBox" type="VBoxContainer" parent="CenterContainer/Panel/VBox"]
+[node name="SummaryBox" type="VBoxContainer" parent="Bubble/VBox"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="SummaryLabel" type="Label" parent="CenterContainer/Panel/VBox/SummaryBox"]
+[node name="SummaryLabel" type="Label" parent="Bubble/VBox/SummaryBox"]
 unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.12, 0.1, 0.08, 1)
 text = "6 / 8  -  +54 Trust Score"
 
-[node name="DoneButton" type="Button" parent="CenterContainer/Panel/VBox/SummaryBox"]
+[node name="DoneButton" type="Button" parent="Bubble/VBox/SummaryBox"]
 unique_name_in_owner = true
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = "Continue"
+
+[node name="Tail" type="Polygon2D" parent="."]
+unique_name_in_owner = true
+color = Color(0.97, 0.96, 0.92, 0.98)
+polygon = PackedVector2Array(-14, 0, 14, 0, 0, 18)

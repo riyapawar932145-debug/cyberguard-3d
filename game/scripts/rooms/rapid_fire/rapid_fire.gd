@@ -8,6 +8,7 @@ extends RoomBase
 ## response signal is global) but harmlessly no-ops since `_pending_object` is never touched here.
 
 @onready var rapid_fire_popup: RapidFirePopup = %RapidFirePopup
+@onready var officer_npc: Node3D = get_node_or_null("Officer")
 
 var _session_active: bool = false
 
@@ -16,7 +17,7 @@ func on_object_clicked(object: Node) -> void:
 	if _session_active or object == null:
 		return
 	_session_active = true
-	rapid_fire_popup.start_session(_get_scenario_pool(), _on_session_result, _on_session_complete)
+	rapid_fire_popup.start_session(_get_scenario_pool(), _on_session_result, _on_session_complete, officer_npc)
 
 
 func _on_session_result(result: Dictionary) -> void:
