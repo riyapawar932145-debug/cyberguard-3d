@@ -2,7 +2,7 @@ extends Node
 ## Single point of contact with the Flask REST API.
 ## Every call spins up its own HTTPRequest child so concurrent calls never collide.
 
-const BASE_URL: String = "http://127.0.0.1:5000"
+const BASE_URL: String = "https://riyapp.pythonanywhere.com"
 
 signal register_success(user: Dictionary)
 signal register_failed(message: String)
