@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/rapid_fire_popup.gd" id="1"]
 
@@ -17,20 +17,6 @@ content_margin_left = 22
 content_margin_right = 22
 content_margin_top = 20
 content_margin_bottom = 20
-
-[sub_resource type="StyleBoxFlat" id="Style_Head"]
-bg_color = Color(0.8, 0.62, 0.48, 1)
-corner_radius_top_left = 17
-corner_radius_top_right = 17
-corner_radius_bottom_left = 17
-corner_radius_bottom_right = 17
-
-[sub_resource type="StyleBoxFlat" id="Style_Shoulders"]
-bg_color = Color(0.16, 0.2, 0.32, 1)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_left = 6
-corner_radius_bottom_right = 6
 
 [node name="RapidFirePopup" type="Control"]
 layout_mode = 3
@@ -68,35 +54,11 @@ theme_override_styles/panel = SubResource("Style_Card")
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="TitleRow" type="HBoxContainer" parent="CenterContainer/Panel/VBox"]
-layout_mode = 2
-theme_override_constants/separation = 12
-alignment = 1
-
-[node name="Portrait" type="VBoxContainer" parent="CenterContainer/Panel/VBox/TitleRow"]
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_constants/separation = 0
-
-[node name="Head" type="Panel" parent="CenterContainer/Panel/VBox/TitleRow/Portrait"]
-custom_minimum_size = Vector2(34, 34)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_styles/panel = SubResource("Style_Head")
-
-[node name="Shoulders" type="Panel" parent="CenterContainer/Panel/VBox/TitleRow/Portrait"]
-custom_minimum_size = Vector2(48, 22)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_styles/panel = SubResource("Style_Shoulders")
-
-[node name="TitleLabel" type="Label" parent="CenterContainer/Panel/VBox/TitleRow"]
+[node name="TitleLabel" type="Label" parent="CenterContainer/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 4
 theme_override_font_sizes/font_size = 22
-vertical_alignment = 1
+horizontal_alignment = 1
 text = "Training Officer"
 
 [node name="HSeparator" type="HSeparator" parent="CenterContainer/Panel/VBox"]
