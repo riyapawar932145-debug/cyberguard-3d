@@ -13,6 +13,8 @@ backend/instance/
 game/.godot/
 game/.import/
 game/export_presets.cfg
+game/web_build/
+game/*.zip
 *.translation
 
 # OS / editor
