@@ -255,8 +255,9 @@ def register_routes(app: Flask) -> None:
         if room not in ROOMS:
             return error(f"unknown room '{room}'", 404)
 
+        language = request.args.get("lang", "en")
         scenarios = Scenario.query.filter_by(room=room).all()
-        return jsonify([s.to_public_dict() for s in scenarios]), 200
+        return jsonify([s.to_public_dict(language) for s in scenarios]), 200
 
     @app.route("/api/result", methods=["POST"])
     def submit_result():

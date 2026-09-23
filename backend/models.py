@@ -57,15 +57,23 @@ class Scenario(db.Model):
         except (TypeError, ValueError):
             return {}
 
-    def to_public_dict(self) -> dict:
-        """Player-facing view - never leaks the answer key before a result is submitted."""
+    def to_public_dict(self, language: str = "en") -> dict:
+        """Player-facing view - never leaks the answer key before a result is submitted.
+
+        `content` is stored as {"en": {...}, "hi": {...}, "mr": {...}} for seeded scenarios, so
+        this unwraps to the requested language, falling back to English and then, for any
+        scenario that's still flat (an older row, or one created directly via the admin API
+        without per-language content), the raw dict as-is.
+        """
+        content_all = self._parsed_content()
+        localized_content = content_all.get(language) or content_all.get("en") or content_all
         return {
             "id": self.id,
             "code": self.code,
             "room": self.room,
             "title": self.title,
             "difficulty": self.difficulty,
-            "content": self._parsed_content(),
+            "content": localized_content,
         }
 
     def to_admin_dict(self) -> dict:

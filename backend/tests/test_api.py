@@ -149,6 +149,36 @@ def test_get_scenarios_unknown_room_404(client):
     assert resp.status_code == 404
 
 
+def test_get_scenarios_respects_lang_query_param(app, client):
+    with app.app_context():
+        db.session.add(
+            Scenario(
+                code="phishing_inbox_lang",
+                room="phishing_inbox",
+                title="Localized Scenario",
+                difficulty=1,
+                is_fraud=True,
+                red_flags="n/a",
+                correct_actions="reported",
+                content='{"en": {"body": "English body"}, "hi": {"body": "हिंदी सामग्री"}, "mr": {"body": "मराठी मजकूर"}}',
+            )
+        )
+        db.session.commit()
+
+    resp_en = client.get("/api/scenarios/phishing_inbox")
+    assert resp_en.get_json()[0]["content"] == {"body": "English body"}
+
+    resp_hi = client.get("/api/scenarios/phishing_inbox?lang=hi")
+    assert resp_hi.get_json()[0]["content"] == {"body": "हिंदी सामग्री"}
+
+    resp_mr = client.get("/api/scenarios/phishing_inbox?lang=mr")
+    assert resp_mr.get_json()[0]["content"] == {"body": "मराठी मजकूर"}
+
+    # An unrecognized language code falls back to English rather than erroring.
+    resp_unknown = client.get("/api/scenarios/phishing_inbox?lang=fr")
+    assert resp_unknown.get_json()[0]["content"] == {"body": "English body"}
+
+
 # ------------------------------------------------------------------ result
 
 

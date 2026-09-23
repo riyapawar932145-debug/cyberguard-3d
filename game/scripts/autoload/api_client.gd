@@ -35,7 +35,7 @@ func login(username: String, password: String) -> void:
 
 
 func load_scenarios(room: String) -> void:
-	_request(HTTPClient.METHOD_GET, "/api/scenarios/%s" % room, null, "scenarios:%s" % room)
+	_request(HTTPClient.METHOD_GET, "/api/scenarios/%s?lang=%s" % [room, Localization.current_language], null, "scenarios:%s" % room)
 
 
 func submit_result(user_id: int, scenario_id: int, action_taken: String, response_time_ms: int) -> void:
