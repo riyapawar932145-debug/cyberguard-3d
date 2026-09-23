@@ -13,8 +13,8 @@ extends Control
 
 const SESSION_LENGTH: int = 8
 const COUNTDOWN_SECONDS: float = 6.0
-const HEAD_HEIGHT: float = 1.75
-const TAIL_GAP: float = 16.0
+const HEAD_HEIGHT: float = 2.1
+const TAIL_GAP: float = 22.0
 const SCREEN_MARGIN: float = 16.0
 
 @onready var bubble: PanelContainer = %Bubble
