@@ -27,16 +27,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		_pitch = clampf(_pitch - event.relative.y * mouse_sensitivity, -1.4, 1.4)
 		head.rotation.x = _pitch
 
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-		var capture: bool = Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED
-		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED if capture else Input.MOUSE_MODE_VISIBLE)
-		return
-
-	# Browsers only grant pointer lock in response to a genuine mouse click, never a keypress -
-	# so on Web export, pressing Esc to release the mouse (browser-enforced, can't be blocked)
-	# then pressing Esc again to try to recapture it silently fails. A left-click while the
-	# mouse is free recaptures it instead; that click is consumed here rather than also firing
-	# an interact raycast, so re-focusing the game never accidentally triggers a click through.
+	# No Esc-to-toggle here deliberately: on Web export, browsers refuse to ever re-grant
+	# pointer lock after the user has pressed Esc to release it themselves (a hard anti-abuse
+	# rule, not something the game can work around) - so binding Esc to release capture would
+	# permanently strand the player with no way back in without reloading the page. The mouse
+	# can still end up uncaptured other ways (switching browser tabs and back, clicking outside
+	# the canvas), which don't trigger that restriction - a left-click while free recaptures it,
+	# consumed here rather than also firing an interact raycast so re-focusing never double-fires.
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT \
 			and Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)

@@ -32,9 +32,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera_pivot.rotation.y = _yaw
 		camera_pivot.rotation.x = _pitch
 
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-		var capture: bool = Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED
-		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED if capture else Input.MOUSE_MODE_VISIBLE)
+	# No Esc-to-toggle here deliberately - see Player._unhandled_input() for why: on Web export,
+	# browsers permanently refuse to re-grant pointer lock once the user presses Esc to release
+	# it themselves. A left-click while the mouse is free recaptures it instead.
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT \
+			and Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 
 func _physics_process(delta: float) -> void:
